@@ -35,6 +35,13 @@ joplin.plugins.register({
 				await joplin.data.post(['tags', message.tag.id, 'notes'], null, {
 					id: noteId
 				});
+			} else if (message.command === 'newTag') {
+				const newTag = await joplin.data.post(['tags'], null, {
+					title: message.name
+				});
+				await joplin.data.post(['tags', newTag.id, 'notes'], null, {
+					id: noteId
+				});
 			}
 		});
 	},

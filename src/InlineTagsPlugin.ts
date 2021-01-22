@@ -8,10 +8,12 @@ module.exports = {
 			let hints = [];
 			if (prefix !== '#') {
 				hints.push({
-					text: `(+) Create new tag: ${prefix}`,
+					text: `Create new tag: ${prefix}`,
 					hint: (cm, data, completion) => {
-						// TODO create and set tag
-						cm.replaceRange(prefix, completion.from || data.from, completion.to || data.to, "complete");
+						context.postMessage({
+							command: 'newTag',
+							name: prefix,
+						});
 					}
 				});
 			}
