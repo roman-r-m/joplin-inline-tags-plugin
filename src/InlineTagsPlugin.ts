@@ -7,15 +7,18 @@ module.exports = {
 			});
 			let hints = [];
 			if (prefix !== '#') {
-				hints.push({
-					text: `Create new tag: ${prefix}`,
-					hint: (cm, data, completion) => {
-						context.postMessage({
-							command: 'newTag',
-							name: prefix,
-						});
-					}
-				});
+				const tagExists = tags.findIndex(t => t.title === prefix) > 0;
+				if (!tagExists) {
+					hints.push({
+						text: `Create new tag: ${prefix}`,
+						hint: (cm, data, completion) => {
+							context.postMessage({
+								command: 'newTag',
+								name: prefix,
+							});
+						}
+					});
+				}
 			}
 			for (let i = 0; i < tags.length; i++) {
 				const tag = tags[i];
