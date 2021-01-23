@@ -42,11 +42,12 @@ module.exports = {
 
 				cm.on('inputRead', async function (cm1, change) {
 					if (!cm1.state.completionActive && change.text[0] === '#') {
+						const start = {line: change.from.line, ch: change.from.ch + 1};
 						const hint = function(cm, callback) {
 							const cursor = cm.getCursor();
-							const token = cm.getTokenAt(cursor);
+							const token = cm.getRange(start, cursor);
 
-							buildHints(token.string).then(hints => {
+							buildHints(token).then(hints => {
 								callback({
 									list: hints,
 									from: {line: change.from.line, ch: change.from.ch + 1},
