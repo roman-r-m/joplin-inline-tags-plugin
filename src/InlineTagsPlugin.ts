@@ -31,7 +31,7 @@ module.exports = {
 								command: 'setTag',
 								tag: tag,
 							});
-							cm.replaceRange(tag.title, completion.from || data.from, completion.to || data.to, "complete");
+							cm.replaceRange(tag.title, completion.from || data.from, cm.getCursor(), "complete");
 						}
 					});
 				}
