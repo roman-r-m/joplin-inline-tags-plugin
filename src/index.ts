@@ -28,7 +28,8 @@ joplin.plugins.register({
 
 			if (message.command === 'getTags') {
 				let allTags = await getAll(joplin.data, ['tags'], { fields: ['id', 'title'], page: 1 });
-				const noteTags = await getAll(joplin.data, ['notes', noteId, 'tags'], { fields: ['id'], page: 1 });
+				const noteTags: string[] =
+					(await getAll(joplin.data, ['notes', noteId, 'tags'], { fields: ['id'], page: 1 })).map(t => t.id);
 				allTags = allTags.filter(t => !noteTags.includes(t.id));
 				return allTags;
 			} else if (message.command === 'setTag') {
