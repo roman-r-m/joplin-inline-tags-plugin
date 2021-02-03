@@ -6,20 +6,6 @@ module.exports = {
 				command: 'getTags',
 			});
 			let hints = [];
-			if (prefix !== '#') {
-				const tagExists = tags.findIndex(t => t.title === prefix) > 0;
-				if (!tagExists) {
-					hints.push({
-						text: `Create new tag: ${prefix}`,
-						hint: (cm, data, completion) => {
-							context.postMessage({
-								command: 'newTag',
-								name: prefix,
-							});
-						}
-					});
-				}
-			}
 			for (let i = 0; i < tags.length; i++) {
 				const tag = tags[i];
 				if (prefix === '#' || tag.title.startsWith(prefix)) {
@@ -32,6 +18,20 @@ module.exports = {
 								tag: tag,
 							});
 							cm.replaceRange(tag.title, completion.from || data.from, cm.getCursor(), "complete");
+						}
+					});
+				}
+			}
+			if (prefix !== '#') {
+				const tagExists = tags.findIndex(t => t.title === prefix) > 0;
+				if (!tagExists) {
+					hints.push({
+						text: `Create new tag: ${prefix}`,
+						hint: (cm, data, completion) => {
+							context.postMessage({
+								command: 'newTag',
+								name: prefix,
+							});
 						}
 					});
 				}
@@ -77,7 +77,7 @@ module.exports = {
 			    'addon/hint/show-hint',
 			    ],
 			codeMirrorOptions: {
-    			'inlineTags': true, //TODO a better way?
+    			'inlineTags': true,
 			},
 			assets: function() {
 			    return [
