@@ -9,7 +9,7 @@ async function getAll(api: JoplinData, path: Path, query: any): Promise<any[]> {
 	while (!!response.has_more) {
 		query.page += 1;
 		response = await api.get(path, query);
-		result.concat(response.items)
+		result = result.concat(response.items);
 	}
 	return result;
 }
