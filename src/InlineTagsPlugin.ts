@@ -2,7 +2,7 @@ module.exports = {
 	default: function(context: any) {
 
 		const buildHints = async (prefix: string) =>{
-			const tags = await context.postMessage({
+			const {tags, keepText } = await context.postMessage({
 				command: 'getTags',
 			});
 			let hints = [];
@@ -17,7 +17,13 @@ module.exports = {
 								command: 'setTag',
 								tag: tag,
 							});
-							cm.replaceRange(tag.title, completion.from || data.from, cm.getCursor(), "complete");
+							if (!!keepText) {
+								cm.replaceRange(tag.title, completion.from || data.from, cm.getCursor(), "complete");
+							} else {
+								const from = completion.from || data.from;
+								from.ch -= 1;
+								cm.replaceRange('', from, cm.getCursor(), "complete");
+							}
 						}
 					});
 				}
@@ -32,6 +38,11 @@ module.exports = {
 								command: 'newTag',
 								name: prefix,
 							});
+							if (!keepText) {
+								const from = completion.from || data.from;
+								from.ch -= 1;
+								cm.replaceRange('', from, cm.getCursor(), "complete");
+							}
 						}
 					});
 				}

@@ -1,6 +1,6 @@
 import joplin from 'api';
 import JoplinData from 'api/JoplinData';
-import { ContentScriptType, Path } from 'api/types';
+import { ContentScriptType, Path, SettingItem, SettingItemType } from 'api/types';
 
 async function getAll(api: JoplinData, path: Path, query: any): Promise<any[]> {
 	query.page = 1;
@@ -16,6 +16,19 @@ async function getAll(api: JoplinData, path: Path, query: any): Promise<any[]> {
 
 joplin.plugins.register({
 	onStart: async function() {
+		await joplin.settings.registerSection('Inline Tags', {
+			description: 'Inline Tags Plugin Settings',
+			label: 'Inline Tags',
+			iconName: 'fas fa-hashtag'
+		});
+		await joplin.settings.registerSetting('keepText', {
+			public: true,
+			section: 'Inline Tags',
+			type: SettingItemType.Bool,
+			value: true,
+			label: 'Keep #tag text in editor',
+		} as SettingItem);
+
 		await joplin.contentScripts.register(
 			ContentScriptType.CodeMirrorPlugin,
 			'inlineTags',
@@ -31,7 +44,12 @@ joplin.plugins.register({
 				const noteTags: string[] =
 					(await getAll(joplin.data, ['notes', noteId, 'tags'], { fields: ['id'], page: 1 })).map(t => t.id);
 				allTags = allTags.filter(t => !noteTags.includes(t.id));
-				return allTags;
+
+				const keepText: boolean = await joplin.settings.value('keepText');
+				return {
+					tags: allTags,
+					keepText: keepText
+				}
 			} else if (message.command === 'setTag') {
 				await joplin.data.post(['tags', message.tag.id, 'notes'], null, {
 					id: noteId
