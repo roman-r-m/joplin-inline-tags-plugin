@@ -21,13 +21,15 @@ joplin.plugins.register({
 			label: 'Inline Tags',
 			iconName: 'fas fa-hashtag'
 		});
-		await joplin.settings.registerSetting('keepText', {
-			public: true,
-			section: 'Inline Tags',
-			type: SettingItemType.Bool,
-			value: true,
-			label: 'Keep #tag text in editor',
-		} as SettingItem);
+		await joplin.settings.registerSettings({
+			'keepText': {
+				public: true,
+				section: 'Inline Tags',
+				type: SettingItemType.Bool,
+				value: true,
+				label: 'Keep #tag text in editor',
+			}
+		});
 
 		await joplin.contentScripts.register(
 			ContentScriptType.CodeMirrorPlugin,
