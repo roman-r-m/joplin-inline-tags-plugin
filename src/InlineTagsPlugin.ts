@@ -51,11 +51,24 @@ module.exports = {
 		}
 
 		const plugin = function(CodeMirror) {
+
 			CodeMirror.defineOption('inlineTags', false, function(cm, value, prev) {
 				if (!value) return;
-
 				cm.on('inputRead', async function (cm1, change) {
 					if (!cm1.state.completionActive && change.text[0] === '#') {
+						const content = await cm1.getValue().split('\n');
+						let count=0;
+						for(let i=0;i<content.length;i++){
+							if(content[i].startsWith('```')){
+								count++;
+								if(i==change.from.line){
+									return;
+								}
+							}
+							if(i==change.from.line && count%2){
+								return;
+							}
+						}
 						const start = {line: change.from.line, ch: change.from.ch + 1};
 						const hint = function(cm, callback) {
 							const cursor = cm.getCursor();
