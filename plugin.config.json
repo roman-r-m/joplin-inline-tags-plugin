@@ -1,5 +1,5 @@
 {
 	"extraScripts": [
-		"InlineTagsPlugin.ts"
+		"contentScript/index.ts"
 	]
 }
