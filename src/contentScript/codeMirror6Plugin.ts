@@ -4,19 +4,43 @@
 // This allows us to continue supporting older versions of Joplin that don't depend
 // on @codemirror/ packages.
 import type * as CodeMirrorAutocompleteType from '@codemirror/autocomplete';
-import type * as CodeMirrorLangMarkdownType from '@codemirror/lang-markdown';
 import type { CompletionContext, CompletionResult, Completion } from '@codemirror/autocomplete';
+import type * as CodeMirrorLanguageType from '@codemirror/language';
+import type { EditorState } from '@codemirror/state';
 
 import { PluginContext } from './types';
 
 const codeMirror6Plugin = (context: PluginContext, CodeMirror: any) => {
 	const { autocompletion, insertCompletionText } = require('@codemirror/autocomplete') as typeof CodeMirrorAutocompleteType;
-	const { markdownLanguage } = require('@codemirror/lang-markdown') as typeof CodeMirrorLangMarkdownType;
-	
+	const { syntaxTree } = require('@codemirror/language') as typeof CodeMirrorLanguageType;
+
+	const isInCodeBlock = (state: EditorState, from: number, to: number) => {
+		let inCodeBlock = false;
+
+		syntaxTree(state).iterate({
+			from,
+			to,
+			enter: (node) => {
+				if (node.name === 'FencedCode' || node.name === 'CodeBlock') {
+					inCodeBlock = true;
+				}
+
+				// Skip all nodes if already known to be in a code block
+				// (false => skip child nodes).
+				return !inCodeBlock;
+			}
+		});
+
+		return inCodeBlock;
+	};
 
 	const completeMarkdown = async (completionContext: CompletionContext): Promise<CompletionResult> => {
 		const prefix = completionContext.matchBefore(/[#][^ \n\t#]*/);
 		if (!prefix) {
+			return null;
+		}
+
+		if (isInCodeBlock(completionContext.state, prefix.from, prefix.to)) {
 			return null;
 		}
 
@@ -92,11 +116,7 @@ const codeMirror6Plugin = (context: PluginContext, CodeMirror: any) => {
 	};
 
 	CodeMirror.addExtension([
-		// Avoid completing in code blocks:
-		markdownLanguage.data.of({
-			autocomplete: completeMarkdown,
-		}),
-		CodeMirror.joplinExtensions.enableLanguageDataAutocomplete.of(true),
+		CodeMirror.joplinExtensions.completionSource(completeMarkdown),
 
 		autocompletion({
 			tooltipClass: () => 'inline-tags-completions',
