@@ -21,10 +21,6 @@
   overflow-y: auto;
 }
 
-.inline-tags-completions.cm-tooltip li {
-  font-family: sans-serif;
-}
-
 .CodeMirror-hint, .inline-tags-completions li {
   margin: 0;
   padding: 0 4px;
