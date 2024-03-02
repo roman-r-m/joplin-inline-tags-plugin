@@ -34,7 +34,7 @@ joplin.plugins.register({
 		await joplin.contentScripts.register(
 			ContentScriptType.CodeMirrorPlugin,
 			'inlineTags',
-			'./InlineTagsPlugin.js'
+			'./contentScript/index.js'
 		);
 
 		await joplin.contentScripts.onMessage('inlineTags', async (message: any) => {
